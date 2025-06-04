@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="icon" type="image/png" href="Icon2.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cocoon - Your Digital Sanctuary</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- Hidden Cats -->
+  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🐱%3C/text%3E%3C/svg%3E" class="hidden-cat" id="cat1" onclick="showCatMessage('Meow! You found me! 🎉')">
+  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E😸%3C/text%3E%3C/svg%3E" class="hidden-cat" id="cat2" onclick="showCatMessage('Purrfect! Keep exploring! 🐾')">
+  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E😺%3C/text%3E%3C/svg%3E" class="hidden-cat" id="cat3" onclick="showCatMessage('You have excellent cat-finding skills! 🏆')">
+
+  <!-- Sticky Top Bar -->
+  <div class="sticky-bar">
+    🎉 <strong data-i18n="sticky.free">Free To Use</strong> <span data-i18n="sticky.journey">Be part of Cocoon's journey! Your insights help me create the perfect browsing experience.</span> <a href="https://chromewebstore.google.com/detail/hhajiefngbekkhfcodcfdoepmoklgakb?utm_source=item-share-cb" target="_blank" class="cta-link" data-i18n="sticky.share">Share Your Thoughts →</a>
+  </div>
+
+  <!-- Feature Control Panel -->
+  <div id="feature-control-panel">
+    <div class="control-helper-text" data-i18n="control.helper">Click to disable</div>
+    <div class="active-features" id="active-features-list">
+      <!-- Features will be populated here -->
+    </div>
+  </div>
+
+  <!-- Focus Arrow -->
+  <div class="focus-arrow" id="focus-arrow" data-i18n="focus.scroll">Scroll down to see focus mode in action!</div>
+
+  <!-- Floating UIs -->
+  <div id="floating-timer">
+    <div class="timer-status" data-i18n="timer.focus">Focus Timer</div>
+    <div class="timer-display" id="timer-display">25:00</div>
+    <div class="timer-controls">
+      <button class="timer-button" onclick="startTimer()" id="start-btn" data-i18n="timer.start">Start</button>
+      <button class="timer-button" onclick="pauseTimer()" id="pause-btn" style="display: none;" data-i18n="timer.pause">Pause</button>
+      <button class="timer-button" onclick="resetTimer()" data-i18n="timer.reset">Reset</button>
+    </div>
+  </div>
+
+  <div id="floating-notes">
+    <button class="notes-button" onclick="toggleNotesPanel()">📝</button>
+    <div class="notes-panel" id="notes-panel">
+      <div class="notes-header" data-i18n="notes.header">🧠 Quick Brain Dump</div>
+      <div class="notes-content">
+        <textarea class="notes-textarea" id="notes-textarea" data-i18n-placeholder="notes.placeholder"></textarea>
+        <div class="notes-controls">
+          <button class="voice-note-btn" onclick="toggleVoiceNote()" id="voice-btn" data-i18n="notes.voice">🎙️ Voice</button>
+          <button class="save-note-btn" onclick="saveNote()" data-i18n="notes.save">💾 Save</button>
+          <button class="undo-note-btn" onclick="undoLastNote()" id="undo-btn" style="display: none;" data-i18n="notes.undo">↶ Undo</button>
+        </div>
+        <div class="notes-list" id="notes-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="floating-accessibility">
+    <div class="accessibility-header" data-i18n="accessibility.header">♿ Accessibility</div>
+    <div class="control-group">
+      <label data-i18n="accessibility.contrast">Contrast</label>
+      <div class="slider-container">
+        <input type="range" id="contrast-slider" min="50" max="200" value="100" oninput="updateAccessibility()">
+        <span class="slider-value" id="contrast-value">100%</span>
+      </div>
+    </div>
+    <div class="control-group">
+      <label data-i18n="accessibility.saturation">Saturation</label>
+      <div class="slider-container">
+        <input type="range" id="saturation-slider" min="0" max="150" value="100" oninput="updateAccessibility()">
+        <span class="slider-value" id="saturation-value">100%</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="floating-background-noise">
+    <div class="noise-header" data-i18n="noise.header">🔊 Background Noise</div>
+    <select class="noise-type-selector" id="noise-selector">
+      <option value="" data-i18n="noise.select">Select ambient sound...</option>
+      <option value="rain" data-i18n="noise.rain">🌧️ Rain</option>
+      <option value="forest" data-i18n="noise.forest">🌲 Forest</option>
+      <option value="ocean" data-i18n="noise.ocean">🌊 Ocean Waves</option>
+      <option value="white" data-i18n="noise.white">📻 White Noise</option>
+      <option value="coffee" data-i18n="noise.coffee">☕ Coffee Shop</option>
+    </select>
+    <div class="control-group">
+      <label data-i18n="noise.volume">Volume</label>
+      <div class="slider-container">
+        <input type="range" id="noise-volume" min="0" max="100" value="30" oninput="updateNoiseVolume()">
+        <span class="slider-value" id="noise-volume-value">30%</span>
+      </div>
+    </div>
+    <div class="noise-controls">
+      <button class="noise-btn" onclick="playNoise()" id="play-noise" data-i18n="noise.play">▶️ Play</button>
+      <button class="noise-btn" onclick="stopNoise()" id="stop-noise" data-i18n="noise.stop">⏹️ Stop</button>
+    </div>
+  </div>
+
+  <!-- Floating Site Blocker UI -->
+  <div id="floating-site-blocker">
+    <div class="blocker-header" data-i18n="blocker.header">🚫 Site Blocker</div>
+    <div class="blocked-sites-list" id="blocked-sites-list">
+      <div class="site-item">
+        <span>📺 youtube.com</span>
+        <button onclick="removeSite('youtube.com')" class="remove-btn">×</button>
+      </div>
+      <div class="site-item">
+        <span>📱 instagram.com</span>
+        <button onclick="removeSite('instagram.com')" class="remove-btn">×</button>
+      </div>
+      <div class="site-item">
+        <span>🐦 twitter.com</span>
+        <button onclick="removeSite('twitter.com')" class="remove-btn">×</button>
+      </div>
+    </div>
+    <div class="add-site-container">
+      <input type="text" id="new-site-input" data-i18n-placeholder="blocker.placeholder" class="site-input">
+      <button onclick="addBlockedSite()" class="add-site-btn" data-i18n="blocker.add">+ Block</button>
+    </div>
+    <div class="blocker-controls">
+      <button class="blocker-btn active" onclick="toggleBlocker()" id="blocker-toggle" data-i18n="blocker.active">🔒 Blocking Active</button>
+      <button class="blocker-btn" onclick="pauseBlocker()" id="blocker-pause" data-i18n="blocker.pause">⏸️ Pause 5min</button>
+    </div>
+  </div>
+
+  <!-- Floating Font Controls UI -->
+  <div id="floating-font-controls">
+    <div class="font-header" data-i18n="font.header">🔤 Font Controls</div>
+    <div class="control-group">
+      <label data-i18n="font.family">Font Family</label>
+      <select class="font-family-selector" id="font-family-selector" onchange="updateFontFamily()">
+        <option value="default" data-i18n="font.default">System Default</option>
+        <option value="Arial, sans-serif">Arial</option>
+        <option value="Georgia, serif">Georgia</option>
+        <option value="'Times New Roman', serif">Times New Roman</option>
+        <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+        <option value="'Courier New', monospace">Courier New</option>
+        <option value="OpenDyslexic, sans-serif" data-i18n="font.friendly">Reading-friendly Font</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label data-i18n="font.size">Font Size</label>
+      <div class="slider-container">
+        <input type="range" id="font-size-main" min="80" max="200" value="100" oninput="updateFontSize()">
+        <span class="slider-value" id="font-size-main-value">100%</span>
+      </div>
+    </div>
+    <div class="control-group">
+      <label data-i18n="font.lineHeight">Line Height</label>
+      <div class="slider-container">
+        <input type="range" id="line-height-slider" min="100" max="250" value="150" oninput="updateLineHeight()">
+        <span class="slider-value" id="line-height-value">150%</span>
+      </div>
+    </div>
+    <div class="font-controls">
+      <button class="font-btn" onclick="resetFontSettings()" id="font-reset" data-i18n="font.reset">↺ Reset</button>
+      <button class="font-btn" onclick="toggleReadingMode()" id="reading-mode" data-i18n="font.reading">📖 Reading Mode</button>
+    </div>
+  </div>
+
+  <div id="focus-overlay" class="focus-overlay"></div>
+
+  <!-- Header -->
+  <header>
+    <nav>
+      <a href="#" class="logo">
+        <img src="icon2.png" alt="Cocoon">
+        Cocoon
+      </a>
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a href="#features" data-i18n="nav.features">Features</a></li>
+          <li><a href="#testimonials" data-i18n="nav.reviews">Reviews</a></li>
+          <li><a href="#founder" data-i18n="nav.founder">Founder Message</a></li>
+        </ul>
+        <div class="language-switcher">
+          <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+          <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">FR</button>
+        </div>
+        <a href="https://chromewebstore.google.com/detail/hhajiefngbekkhfcodcfdoepmoklgakb?utm_source=item-share-cb" target="_blank" class="cta-button" data-i18n="nav.join">Join the Journey</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 id="main-title" onclick="triggerTitleFall()" style="cursor: pointer; transition: all 0.3s ease;" data-i18n="hero.title">Transform Your Digital Life in 60 Seconds</h1>
+      <p class="subtitle" data-i18n="hero.subtitle">Stop Struggling with Digital Overwhelm</p>
+      <p data-i18n="hero.description">Be part of Cocoon and help it grow into a true 'All-in-one' extension!</p>
+      <div class="hero-actions">
+        <a href="https://chromewebstore.google.com/detail/hhajiefngbekkhfcodcfdoepmoklgakb?utm_source=item-share-cb" target="_blank" class="primary-cta" data-i18n="hero.primary">Use Cocoon - For Free</a>
+        <button onclick="enableAllDemos()" class="secondary-cta" data-i18n="hero.demo">Try Live Demo</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Proof -->
+  <section class="social-proof">
+    <h3 data-i18n="social.title">Trusted by Leading AI Assistants & Me</h3>
+    <div class="trust-logos">
+      <div class="trust-logo" data-i18n="social.rating">I Give It ⭐⭐⭐⭐⭐</div>
+      <div class="trust-logo"><strike data-i18n="social.users">50K+ Active Users</strike> <span data-i18n="social.me">just me</span></div>
+      <div class="trust-logo" data-i18n="social.approved">AI-Approved Tools</div>
+      <div class="trust-logo" data-i18n="social.friendly">User friendly</div>
+    </div>
+  </section>
+
+  <!-- Problems Section -->
+  <section class="problems">
+    <div class="problems-container">
+      <h2 data-i18n="problems.title">Tired of Digital Chaos Ruining Your Focus?</h2>
+      <p class="subtitle" data-i18n="problems.subtitle">You're not alone. These pain points destroy productivity and peace of mind for millions every day:</p>
+      <div class="pain-points">
+        <div class="pain-point">
+          <div class="icon">😵‍💫</div>
+          <h3 data-i18n="problems.overwhelming.title">Overwhelming Websites</h3>
+          <p data-i18n="problems.overwhelming.desc">Too many flashing ads, autoplaying videos, and cluttered interfaces that assault your senses and derail your concentration.</p>
+        </div>
+        
+        <div class="pain-point">
+          <div class="icon">⏰</div>
+          <h3 data-i18n="problems.time.title">Time Blindness & Procrastination</h3>
+          <p data-i18n="problems.time.desc">Hours disappear into social media scrolls and rabbit holes while important tasks remain undone, creating stress and guilt.</p>
+        </div>
+        
+        <div class="pain-point">
+          <div class="icon">🤯</div>
+          <h3 data-i18n="problems.cognitive.title">Cognitive Overload</h3>
+          <p data-i18n="problems.cognitive.desc">Your brain feels tired from processing too much information, making it impossible to think clearly or make decisions.</p>
+        </div>
+        
+        <div class="pain-point">
+          <div class="icon">😤</div>
+          <h3 data-i18n="problems.barriers.title">Accessibility Barriers</h3>
+          <p data-i18n="problems.barriers.desc">Websites ignore user needs with harsh colors, tiny fonts, and confusing navigation that make browsing painful.</p>
+        </div>
+        
+        <!-- Mental Health card -->
+        <div class="pain-point">
+          <div class="icon">💔</div>
+          <h3 data-i18n="problems.mental.title">Mental Health Impact</h3>
+          <p data-i18n="problems.mental.desc">Constant digital overwhelm increases anxiety, depression, and burnout, affecting your real-world relationships and well-being.</p>
+        </div>
+        
+        <!-- Separate cat therapy card that only appears on hover -->
+        <div class="pain-point cat-therapy-card" onmouseenter="showCatMessage('🎉 Congratulations! You found the secret cat therapy! Sometimes the internet just needs more cats! 🐱✨')">
+          <div class="icon cat-container" style="position: relative; width: 100%; height: 250px; overflow: hidden; border-radius: 16px; margin-bottom: 1rem;">
+            <img src="cat2.gif" alt="Hidden Cat" style="width: 100%; height: 100%; object-fit: contain; object-position: center; border-radius: 16px; background-color: white;">
+          </div>
+          <h3 data-i18n="problems.cat.title">Secret Cat Therapy</h3>
+          <p data-i18n="problems.cat.desc">Sometimes you just need a cute cat to remind you that the internet can still be a wonderful place. 🐱</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solutions Section -->
+  <section id="features" class="solutions">
+    <div class="solutions-container">
+      <h2 data-i18n="solutions.title">Finally, A Digital Sanctuary That Actually Works</h2>
+      <p class="subtitle" data-i18n="solutions.subtitle">Cocoon transforms your browsing experience with gentle, intelligent tools designed by someone who truly understands the struggle.</p>
+      
+      <div class="solutions-grid">
+        <div class="solution-card">
+          <div class="solution-icon">🎯</div>
+          <h3 data-i18n="solutions.focus.title">Instant Focus Mode</h3>
+          <p data-i18n="solutions.focus.desc">Dim distractions and highlight what matters with one click. Perfect for minds that need visual simplification.</p>
+          <ul class="solution-features">
+            <li data-i18n="solutions.focus.feat1">Adjustable dimming intensity</li>
+            <li data-i18n="solutions.focus.feat2">Smart content recognition</li>
+            <li data-i18n="solutions.focus.feat3">Works on ANY website</li>
+            <li data-i18n="solutions.focus.feat4">Keyboard shortcuts</li>
+          </ul>
+          <button onclick="toggleFocusMode()" class="try-feature-btn" data-i18n="solutions.focus.try">Try Focus Mode</button>
+        </div>
+
+        <div class="solution-card">
+          <div class="solution-icon">♿</div>
+          <h3 data-i18n="solutions.accessibility.title">Sensory-Friendly Controls</h3>
+          <p data-i18n="solutions.accessibility.desc">Customize colors, contrast, motion, and fonts to match your sensory needs. No more eye strain or visual overwhelm.</p>
+          <ul class="solution-features">
+            <li data-i18n="solutions.accessibility.feat1">Real-time color adjustments</li>
+            <li data-i18n="solutions.accessibility.feat2">Motion reduction settings</li>
+            <li data-i18n="solutions.accessibility.feat3">Reading-friendly fonts</li>
+            <li data-i18n="solutions.accessibility.feat4">High contrast modes</li>
+          </ul>
+          <button onclick="showFeature('accessibility')" class="try-feature-btn" data-i18n="solutions.accessibility.try">Try Color and Contrast Slider</button>
+        </div>
+
+        <div class="solution-card">
+          <div class="solution-icon">🧠</div>
+          <h3 data-i18n="solutions.notes.title">Brain Dump & Memory Aid</h3>
+          <p data-i18n="solutions.notes.desc">Capture fleeting thoughts instantly with voice notes and quick text. Never lose an important idea again.</p>
+          <ul class="solution-features">
+            <li data-i18n="solutions.notes.feat1">Voice recording capability</li>
+            <li data-i18n="solutions.notes.feat2">Auto bullet-point formatting</li>
+            <li data-i18n="solutions.notes.feat3">Instant note saving</li>
+            <li data-i18n="solutions.notes.feat4">Searchable note history</li>
+          </ul>
+          <button onclick="showFeature('notes')" class="try-feature-btn" data-i18n="solutions.notes.try">Try Brain Dump</button>
+        </div>
+
+        <div class="solution-card">
+          <div class="solution-icon">💬</div>
+          <h3 data-i18n="solutions.communication.title">Communication Support</h3>
+          <p><span data-i18n="solutions.communication.desc1">Understand</span> <span class="literal-highlight"><span data-i18n="solutions.communication.idiom">idioms and sarcasm</span><span class="literal-tool-tip" data-i18n="solutions.communication.tooltip">Figures of speech explained clearly</span></span> <span data-i18n="solutions.communication.desc2">with our literal language translator. Navigate social media safely.</span></p>
+          <ul class="solution-features">
+            <li data-i18n="solutions.communication.feat1">Idiom translation tool tips</li>
+            <li data-i18n="solutions.communication.feat2">Sarcasm detection</li>
+            <li data-i18n="solutions.communication.feat3">Comment filtering</li>
+            <li data-i18n="solutions.communication.feat4">Pre-written responses</li>
+          </ul>
+          <button onclick="enableLiteralLanguage()" class="try-feature-btn" data-i18n="solutions.communication.try">Try Communication Aid</button>
+        </div>
+
+        <div class="solution-card">
+          <div class="solution-icon">🔊</div>
+          <h3 data-i18n="solutions.soundscapes.title">Calming Soundscapes</h3>
+          <p data-i18n="solutions.soundscapes.desc">Block jarring sounds and replace them with peaceful background noise. Create your perfect audio environment.</p>
+          <ul class="solution-features">
+            <li data-i18n="solutions.soundscapes.feat1">Nature sounds library</li>
+            <li data-i18n="solutions.soundscapes.feat2">White/pink/brown noise</li>
+            <li data-i18n="solutions.soundscapes.feat3">Volume normalization</li>
+            <li data-i18n="solutions.soundscapes.feat4">Sound blocking filters</li>
+          </ul>
+          <button onclick="showFeature('noise')" class="try-feature-btn" data-i18n="solutions.soundscapes.try">Try Background Sounds</button>
+        </div>
+
+        <div class="solution-card">
+          <div class="solution-icon">⏱️</div>
+          <h3 data-i18n="solutions.timer.title">Gentle Time Management</h3>
+          <p data-i18n="solutions.timer.desc">Draggable Pomodoro timer that follows you across tabs. Visual progress tracking without pressure or stress.</p>
+          <ul class="solution-features">
+            <li data-i18n="solutions.timer.feat1">Customizable work/break periods</li>
+            <li data-i18n="solutions.timer.feat2">Visual and audio cues</li>
+            <li data-i18n="solutions.timer.feat3">Cross-tab persistence</li>
+            <li data-i18n="solutions.timer.feat4">Gentle notifications</li>
+          </ul>
+          <button onclick="showFeature('timer')" class="try-feature-btn" data-i18n="solutions.timer.try">Try Focus Timer</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Focus Demo Section -->
+  <div class="focus-demo-text" id="focus-demo-text">
+    <h3 data-i18n="demo.title">🎯 Experience Focus Mode Right Here</h3>
+    <p data-i18n="demo.desc1">This paragraph demonstrates how focus mode works. When you click "Try Focus Mode" below, everything else will dim while this content remains highlighted and easy to read.</p>
+    <p><span data-i18n="demo.desc2">You can also test our literal language feature.</span> <span class="literal-highlight"><span data-i18n="demo.idiom1">It's raining cats and dogs</span><span class="literal-tool-tip" data-i18n="demo.tooltip1">It's raining very heavily</span></span> <span data-i18n="demo.desc3">outside, but don't worry -</span> <span class="literal-highlight"><span data-i18n="demo.idiom2">that's just a piece of cake</span><span class="literal-tool-tip" data-i18n="demo.tooltip2">that's very easy</span></span> <span data-i18n="demo.desc4">to understand with our translator!</span></p>
+    <p><strong data-i18n="demo.try">Try it:</strong> <button onclick="toggleFocusMode()" class="try-feature-btn" style="width: auto; margin: 0 0.5rem;" data-i18n="demo.toggleFocus">Toggle Focus Mode</button> <span data-i18n="demo.or">or</span> <button onclick="enableLiteralLanguage()" class="try-feature-btn" style="width: auto; margin: 0 0.5rem;" data-i18n="demo.enableLiteral">Enable Literal Language</button></p>
+  </div>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials" class="testimonials">
+    <div class="testimonials-container">
+      <h2 data-i18n="testimonials.title">What REAL Users Are Saying</h2>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial">
+          <div class="testimonial-text" data-i18n="testimonials.chatgpt.text">
+            "As an AI assistant, I wish all my users had access to Cocoon's focus tools. The user-friendly design is exactly what the internet needs - thoughtful, gentle, and genuinely helpful."
+          </div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">🤖</div>
+            <div class="testimonial-info">
+              <h4>ChatGPT</h4>
+              <p data-i18n="testimonials.chatgpt.role">AI Assistant, OpenAI <em>(A Human who isnt Biased)</em></p>
+              <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial">
+          <div class="testimonial-text" data-i18n="testimonials.claude.text">
+            "Cocoon solves problems I didn't even know I had. The accessibility features are game-changing for anyone who finds standard websites overwhelming. This is how the web should work for everyone."
+          </div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">🧠</div>
+            <div class="testimonial-info">
+              <h4>Claude</h4>
+              <p data-i18n="testimonials.claude.role">AI Assistant, Anthropic <em>(Human)</em></p>
+              <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial">
+          <div class="testimonial-text" data-i18n="testimonials.bard.text">
+            "Finally, a browser extension made for people who want a calmer internet experience. The literal language translator alone has saved me countless misunderstandings. Cocoon gets it."
+          </div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">📱</div>
+            <div class="testimonial-info">
+              <h4>Bard</h4>
+              <p data-i18n="testimonials.bard.role">AI Assistant, Google <em>(At least the name sounds human)</em></p>
+              <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use Cases Section -->
+  <section class="use-cases">
+    <div class="use-cases-container">
+      <h2 data-i18n="usecases.title">Perfect for Every Situation</h2>
+      <div class="use-cases-tabs">
+        <button class="use-case-tab active" onclick="showUseCase('work')" data-i18n="usecases.work.tab">🏢 At Work</button>
+        <button class="use-case-tab" onclick="showUseCase('study')" data-i18n="usecases.study.tab">📚 Studying</button>
+        <button class="use-case-tab" onclick="showUseCase('social')" data-i18n="usecases.social.tab">💬 Social Media</button>
+      </div>
+      
+      <div class="use-case-content active" id="work-content">
+        <h3 data-i18n="usecases.work.title">Maximize Workplace Productivity</h3>
+        <p data-i18n="usecases.work.desc">Turn your browser into a professional powerhouse. Block distractions, customize your reading experience, and maintain laser focus during work hours with enterprise-grade productivity tools.</p>
+        <div class="use-case-features">
+          <div class="use-case-feature">✅ <strong data-i18n="usecases.work.feat1.bold">Smart Website Blocking</strong> <span data-i18n="usecases.work.feat1.desc">- automatically blocks social media during work hours</span></div>
+          <div class="use-case-feature">✅ <strong data-i18n="usecases.work.feat2.bold">Professional Timer</strong> <span data-i18n="usecases.work.feat2.desc">- Pomodoro technique for maximum productivity</span></div>
+          <div class="use-case-feature">✅ <strong data-i18n="usecases.work.feat3.bold">Meeting Notes</strong> <span data-i18n="usecases.work.feat3.desc">- quick capture without leaving your browser</span></div>
+          <div class="use-case-feature">✅ <strong data-i18n="usecases.work.feat4.bold">Professional Typography</strong> <span data-i18n="usecases.work.feat4.desc">- optimize fonts for long document reading</span></div>
+        </div>
+        <button onclick="showWorkFeaturesFixed()" class="primary-cta" data-i18n="usecases.work.try">Try Professional Setup</button>
+      </div>
+
+      <div class="use-case-content" id="study-content">
+        <h3 data-i18n="usecases.study.title">Deep Focus Learning Environment</h3>
+        <p data-i18n="usecases.study.desc">Create the perfect study bubble. Whether you're researching, writing papers, or taking online courses, Cocoon eliminates distractions and enhances concentration with scientifically-designed focus tools.</p>
+        <div class="use-case-features">
+          <div class="use-case-feature">✅ <strong data-i18n="usecases.study.feat1.bold">One Element Focus</strong> <span data-i18n="usecases.study.feat1.desc">- dim everything except what you're reading</span></div>
+          <div class="use-case-feature">✅ <strong data-i18n="usecases.study.feat2.bold">Study Timer</strong> <span data-i18n="usecases.study.feat2.desc">- scientifically optimized focus sessions</span></div>
+          <div class="use-case-feature">✅ <strong data-i18n="usecases.study.feat3.bold">Research Notes</strong> <span data-i18n="usecases.study.feat3.desc">- capture insights and citations instantly</span></div>
+          <div class="use-case-feature">✅ <strong data-i18n="usecases.study.feat4.bold">Calm Background Sounds</strong> <span data-i18n="usecases.study.feat4.desc">- white noise and nature sounds for concentration</span></div>
+        </div>
+        <button onclick="showStudyFeaturesFixed()" class="primary-cta" data-i18n="usecases.study.try">Try Study Environment</button>
+      </div>
+
+      <div class="use-case-content" id="social-content">
+        <h3 data-i18n="usecases.social.title">Safer Social Media</h3>
+        <p style="font-size: 1.1em; margin-bottom: 20px;" data-i18n="usecases.social.desc">Yeah sorry it will be kinda awkward to show all this in a website - just download the extension trust me it's good!</p>
+        <div class="use-case-features">
+          <div class="use-case-feature" data-i18n="usecases.social.feat1">✅ Set healthy time limits</div>
+          <div class="use-case-feature" data-i18n="usecases.social.feat2">✅ Filter out confrontational language</div>
+          <div class="use-case-feature" data-i18n="usecases.social.feat3">✅ Translate sarcasm and idioms</div>
+          <div class="use-case-feature" data-i18n="usecases.social.feat4">✅ Pre-written responses for difficult situations</div>
+        </div>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfk7RbYNvB9yABCTI_uGABR5sGV_fBtC717afHtbiKIzAGcRA/viewform" target="_blank" class="primary-cta" data-i18n="usecases.social.try">Get Early Access</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA Section -->
+  <section id="cta" class="final-cta">
+    <div class="final-cta-content">
+      <h2 data-i18n="cta.title">Ready to Experience Cocoon for Free?</h2>
+      <p data-i18n="cta.desc">Join Cocoon and help shape the future of a more productive and accesible browsing. The Extension where your voice matters in creating something extraordinary!</p>
+      <a href="https://chromewebstore.google.com/detail/hhajiefngbekkhfcodcfdoepmoklgakb?utm_source=item-share-cb" target="_blank" class="primary-cta" data-i18n="cta.button">Get Free Access</a>
+      <p class="urgency-text" data-i18n="cta.urgency">🌟 Early access edition - help me make it perfect for you!</p>
+    </div>
+  </section>
+
+  <!-- Founder Section -->
+  <section id="founder" class="founder-section">
+    <div class="founder-container">
+      <div class="founder-message">
+        <h4 data-i18n="founder.label">Founder Message</h4>
+        <h2 data-i18n="founder.title">Built by Someone Who Gets It</h2>
+        <p data-i18n="founder.greeting">Hiyayaya!</p> 
+        <p data-i18n="founder.intro">I'm the person who made this tool! 😄</p> 
+        <p data-i18n="founder.honesty">Okay, I know some parts of this don't exactly scream professionalism, but I wanted to have as much fun as possible making it—otherwise it would've felt like a chore.</p> 
+        <p data-i18n="founder.why">I created this because I was seriously struggling online. I read so many productivity tips that I ended up juggling three different devices, tweaking system settings nonstop, and still not getting anywhere. It got ridiculous.</p> 
+        <p data-i18n="founder.solution">So I figured—why not build a tool that actually solves the problems I was facing? Fast forward through months of learning how to (yes, the learning curve was horrendous), and… well, this is what came out of it! 🎉</p> 
+        <p data-i18n="founder.hope">Anyway, I hope you enjoy using it as much as I enjoyed making it. There's a feedback form in the footer—I'd love to hear your thoughts and keep improving it!</p>
+        <div class="founder-signature">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 50'%3E%3Ctext x='10' y='35' font-family='cursive' font-size='24' fill='%23065f46'%3EA.D%3C/text%3E%3C/svg%3E" alt="Signature" />
+          <p style="text-align: left;"><strong>A.D</strong><br><span data-i18n="founder.role">Cocoon Creator</span></p>
+        </div>
+      </div>
+      
+      <div class="founder-photo" style="position: relative;">
+        <img src="founder.png" alt="Founder Photo">
+        <!-- Peeking Cat Icon -->
+        <img src="cat-peeking.png" id="founder-cat"
+             style="position: absolute; bottom: 30%; left: 48%; transform: translateX(-50%); width: 90px; cursor: pointer; z-index: 5; transition: all 0.3s ease;" 
+             onclick="replaceWithCat4()" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Cocoon</h4>
+        <p data-i18n="footer.tagline">Your digital sanctuary for mindful browsing.</p>
+        <p data-i18n="footer.made">Made with 💚</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4 data-i18n="footer.support">Support</h4>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfk7RbYNvB9yABCTI_uGABR5sGV_fBtC717afHtbiKIzAGcRA/viewform" target="_blank" data-i18n="footer.share">Share Your Experience</a><br>
+        <a href="mailto:cocoon.plugin@gmail.com">cocoon.plugin@gmail.com</a>
+      </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p data-i18n="footer.copyright">&copy; 2025 Cocoon. All rights reserved</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
